@@ -56,3 +56,4 @@ A simple, scalable microservice that:
 ```bash
 git clone https://github.com/your-repo/user-activity-service.git
 cd user-activity-service
+
