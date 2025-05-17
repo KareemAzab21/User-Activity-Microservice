@@ -1,7 +1,7 @@
 module.exports = {
     kafkaConfig: {
       clientId: 'user-activity-service',
-      brokers: process.env.KAFKA_BROKERS, // Replace with your Confluent bootstrap servers
+      brokers: process.env.KAFKA_BROKERS.split(','), // Replace with your Confluent bootstrap servers
       ssl: true,
       sasl: {
         mechanism: 'plain',
