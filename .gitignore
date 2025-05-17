@@ -11,5 +11,6 @@ yarn-error.log*
 # Dependency directories
 node_modules/
 
+# Secrets
 k8s/mongo-secret.yaml
 k8s/kafka-secret.yaml
