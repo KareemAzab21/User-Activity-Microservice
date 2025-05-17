@@ -1,4 +1,4 @@
-# Event-Driven Microservice with Node.js, MongoDB & GKE
+# Event-Driven Microservice with Node.js, MongoDB , GKE and Confluent (apache kafka)
 
 🚀 A scalable, Kubernetes-deployed microservice with a REST API for user activity tracking.
 
@@ -113,6 +113,12 @@ helm install mongodb bitnami/mongodb --set auth.enabled=false
 
 ### 4. Deploy the Application
 ```bash
+# Build the Docker image
+docker build -t gcr.io/[YOUR-GCP-PROJECT-ID]/activity-service:latest .
+
+# Push to Google Container Registry
+docker push gcr.io/[YOUR-GCP-PROJECT-ID]/activity-service:latest
+
 kubectl apply -f k8s/deployment.yaml
 kubectl apply -f k8s/service.yaml
 ```
