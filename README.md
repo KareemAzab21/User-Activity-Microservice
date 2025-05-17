@@ -1,4 +1,4 @@
-# Event-Driven Microservice with Node.js, MongoDB & GKE
+# Event-Driven Microservice with Node.js, MongoDB , GKE and Confluent (apache kafka)
 
 🚀 A scalable, Kubernetes-deployed microservice with a REST API for user activity tracking.
 
@@ -11,6 +11,7 @@
 - [Running Locally](#running-locally)
 - [Docker Deployment](#docker-deployment)
 - [Kubernetes (GKE) Deployment](#kubernetes-gke-deployment)
+- [Project Structure](#project_structure)
 
 
 ## Project Overview
@@ -44,6 +45,7 @@ A simple, scalable microservice that:
 - Google Cloud SDK
 - kubectl
 - MongoDB Atlas account (or local MongoDB)
+- Cluster on Confluent
 
 ## Setup & Installation
 
@@ -64,6 +66,9 @@ Create a .env file in the root directory:
 ```bash
 MONGODB_URI=mongodb+srv://<user>:<password>@cluster.mongodb.net/activity
 PORT=3000
+KAFKA_BROKERS=<Broker Server>
+KAFKA_USERNAME=<API KEY>
+KAFKA_PASSWORD=<API SECRET>
 ```
 
 ## 🧪 Running Locally
@@ -113,9 +118,17 @@ helm install mongodb bitnami/mongodb --set auth.enabled=false
 
 ### 4. Deploy the Application
 ```bash
+# Build the Docker image
+docker build -t gcr.io/[YOUR-GCP-PROJECT-ID]/activity-service:latest .
+
+# Push to Google Container Registry
+docker push gcr.io/[YOUR-GCP-PROJECT-ID]/activity-service:latest
+kubectl apply -f k8s/mongo-secret.yaml
+kubectl apply -f k8s/kafka-secret.yaml
 kubectl apply -f k8s/deployment.yaml
 kubectl apply -f k8s/service.yaml
 ```
+##### 📌 make sure to create your own mongo-secret.yaml and kafka-secret.yaml which contained the credentials to your mangoDB and kafka broker. You can find mine in .gitignore 😊
 
 ### 5. Get the External IP
 ```bash
@@ -126,4 +139,74 @@ kubectl get service user-activity-service
 ```bash
 http://<external-ip>
 ```
+
+### 📬 You can test by Postmant
+#### POST to push activity to a topic by producer
+```bash
+http://<external-ip>/api/activities
+```
+#### GET to get the activity stored in MongoDB by Consumer
+```bash
+http://<external-ip>/api/activities?page=1&limit=5
+```
+---
+
+## 🏗️ Project Structure (DDD Approach)
+```bash
+User-Activity-Microservice/
+├── k8s/                     # Kubernetes manifests
+├── src/
+│   ├── core/                # � Domain Layer
+│   │   ├── entities/        # Business objects (e.g., Activity)
+│   │   ├── services/        # Domain logic (e.g., ActivityService)
+│   │   └── interfaces/      # Domain contracts (e.g., IActivityRepository)
+│   │
+│   ├── infrastructure/      # 🏗️ Infrastructure Layer
+│   │   ├── database/        # MongoDB adapters (Repository implementations)
+│   │   └── kafka/           # Kafka producers/consumers
+│   │
+│   └── interfaces/http/     # 🌐 Application Layer
+│       ├── controllers/     # Route handlers
+│       ├── routes/          # Express routers
+│       └── server.js        # Web server setup
+│
+├── .env.example             # Environment template
+└── docker-compose.yaml      # Local orchestration
+```
+### Why Domain-Driven Design?
+
+  ####  1.Clear Separation of Concerns
+
+  - core/: Pure business logic (no tech details)
+
+  - infrastructure/: Database/Kafka implementations
+
+  - interfaces/: Delivery mechanisms (HTTP, CLI, etc.)
+
+  #### 2.Improved Maintainability
+
+  - Changes to Kafka/MongoDB won’t break domain logic.
+
+  - Easy to swap technologies (e.g., Kafka → RabbitMQ).
+
+  #### 3.Ubiquitous Language
+
+  - Domain terms (e.g., Activity) are consistent across code, docs, and discussions.
+
+  #### 4.Scalability
+
+  - Isolated layers simplify adding features (e.g., new delivery methods like WebSockets).
+
+---    
+
+### 🔑 Key DDD Concepts Applied
+
+  - Entities: Activity (unique identity, business rules)
+
+  - Value Objects: Metadata (immutable, no identity)
+
+  - Aggregates: UserActivities (consistency boundary)
+
+  - Repositories: ActivityRepository (persistence abstraction)
+
 
