@@ -20,3 +20,8 @@ spec:
         envFrom:
         - secretRef:
             name: mongo-secret
+        - secretRef:
+            name: kafka-secret 
+        env:
+        - name: NODE_ENV
+          value: "production"
