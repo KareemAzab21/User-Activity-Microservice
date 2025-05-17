@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: activity-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: activity
+  template:
+    metadata:
+      labels:
+        app: activity
+    spec:
+      containers:
+      - name: activity
+        image: gcr.io/user-activity-460020/activity-service:latest
+        ports:
+        - containerPort: 3000
+        envFrom:
+        - secretRef:
+            name: mongo-secret
