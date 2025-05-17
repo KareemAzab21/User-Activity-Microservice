@@ -1,15 +1,34 @@
-const express = require('express');
-const connectDB = require('./db');
-const router = require('./routes');
+require('dotenv').config();
+const mongoose = require('mongoose');
+const ActivityModel = require('./infrastructure/database/models/Activity');
+const ActivityRepository = require('./infrastructure/database/repositories/ActivityRepository');
+const ActivityService = require('./core/services/ActivityService');
+const ActivityProducer = require('./infrastructure/kafka/producer');
+const ActivityConsumer = require('./infrastructure/kafka/consumer');
+const ActivityController = require('./interfaces/http/controllers/ActivityController');
+const Server = require('./interfaces/http/server');
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+async function bootstrap() {
+  // Database connection
+  await mongoose.connect(process.env.MONGODB_URI);
 
-app.use(express.json());
-app.use('/api', router);
+  // Initialize dependencies
+  const activityRepository = new ActivityRepository(ActivityModel);
+  const activityService = new ActivityService(activityRepository);
+  const producer = new ActivityProducer();
+  await producer.connect();
 
-connectDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
-  });
+  const consumer = new ActivityConsumer(activityService);
+  await consumer.start();  
+  
+  const controller = new ActivityController(activityService, producer);
+  const server = new Server(controller);
+
+  // Start server
+  await server.start();
+}
+
+bootstrap().catch(err => {
+  console.error('Failed to start application:', err);
+  process.exit(1);
 });
