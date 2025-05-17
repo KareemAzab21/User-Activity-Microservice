@@ -11,6 +11,7 @@
 - [Running Locally](#running-locally)
 - [Docker Deployment](#docker-deployment)
 - [Kubernetes (GKE) Deployment](#kubernetes-gke-deployment)
+- [Project Structure](#project_structure)
 
 
 ## Project Overview
@@ -148,4 +149,64 @@ http://<external-ip>/api/activities
 ```bash
 http://<external-ip>/api/activities?page=1&limit=5
 ```
+---
+
+## 🏗️ Project Structure (DDD Approach)
+```bash
+User-Activity-Microservice/
+├── k8s/                     # Kubernetes manifests
+├── src/
+│   ├── core/                # � Domain Layer
+│   │   ├── entities/        # Business objects (e.g., Activity)
+│   │   ├── services/        # Domain logic (e.g., ActivityService)
+│   │   └── interfaces/      # Domain contracts (e.g., IActivityRepository)
+│   │
+│   ├── infrastructure/      # 🏗️ Infrastructure Layer
+│   │   ├── database/        # MongoDB adapters (Repository implementations)
+│   │   └── kafka/           # Kafka producers/consumers
+│   │
+│   └── interfaces/http/     # 🌐 Application Layer
+│       ├── controllers/     # Route handlers
+│       ├── routes/          # Express routers
+│       └── server.js        # Web server setup
+│
+├── .env.example             # Environment template
+└── docker-compose.yaml      # Local orchestration
+```
+### Why Domain-Driven Design?
+
+  ####  1.Clear Separation of Concerns
+
+  - core/: Pure business logic (no tech details)
+
+  - infrastructure/: Database/Kafka implementations
+
+  - interfaces/: Delivery mechanisms (HTTP, CLI, etc.)
+
+  #### 2.Improved Maintainability
+
+  - Changes to Kafka/MongoDB won’t break domain logic.
+
+  - Easy to swap technologies (e.g., Kafka → RabbitMQ).
+
+  #### 3.Ubiquitous Language
+
+  - Domain terms (e.g., Activity) are consistent across code, docs, and discussions.
+
+  #### 4.Scalability
+
+  - Isolated layers simplify adding features (e.g., new delivery methods like WebSockets).
+
+---    
+
+### 🔑 Key DDD Concepts Applied
+
+  - Entities: Activity (unique identity, business rules)
+
+  - Value Objects: Metadata (immutable, no identity)
+
+  - Aggregates: UserActivities (consistency boundary)
+
+  - Repositories: ActivityRepository (persistence abstraction)
+
 
