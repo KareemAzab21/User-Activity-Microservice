@@ -44,6 +44,7 @@ A simple, scalable microservice that:
 - Google Cloud SDK
 - kubectl
 - MongoDB Atlas account (or local MongoDB)
+- Cluster on Confluent
 
 ## Setup & Installation
 
@@ -64,6 +65,9 @@ Create a .env file in the root directory:
 ```bash
 MONGODB_URI=mongodb+srv://<user>:<password>@cluster.mongodb.net/activity
 PORT=3000
+KAFKA_BROKERS=<Broker Server>
+KAFKA_USERNAME=<API KEY>
+KAFKA_PASSWORD=<API SECRET>
 ```
 
 ## 🧪 Running Locally
@@ -118,10 +122,12 @@ docker build -t gcr.io/[YOUR-GCP-PROJECT-ID]/activity-service:latest .
 
 # Push to Google Container Registry
 docker push gcr.io/[YOUR-GCP-PROJECT-ID]/activity-service:latest
-
+kubectl apply -f k8s/mongo-secret.yaml
+kubectl apply -f k8s/kafka-secret.yaml
 kubectl apply -f k8s/deployment.yaml
 kubectl apply -f k8s/service.yaml
 ```
+##### 📌 make sure to create your own mongo-secret.yaml and kafka-secret.yaml which contained the credentials to your mangoDB and kafka broker. You can find mine in .gitignore 😊
 
 ### 5. Get the External IP
 ```bash
@@ -131,5 +137,15 @@ kubectl get service user-activity-service
 #### Look under the EXTERNAL-IP column and use that IP to access the app:
 ```bash
 http://<external-ip>
+```
+
+### 📬 You can test by Postmant
+#### POST to push activity to a topic by producer
+```bash
+http://<external-ip>/api/activities
+```
+#### GET to get the activity stored in MongoDB by Consumer
+```bash
+http://<external-ip>/api/activities?page=1&limit=5
 ```
 
