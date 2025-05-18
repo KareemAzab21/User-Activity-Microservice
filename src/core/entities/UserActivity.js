@@ -2,8 +2,6 @@ class UserActivity {
     constructor({ userId, action, entityType, entityId, metadata }) {
       this.userId = userId;
       this.action = action;
-      this.entityType = entityType;
-      this.entityId = entityId;
       this.metadata = metadata;
       this.timestamp = new Date();
     }

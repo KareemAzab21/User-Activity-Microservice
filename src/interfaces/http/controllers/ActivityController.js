@@ -14,7 +14,7 @@ class ActivityController {
         activityId: activity.id 
       });
     } catch (err) {
-      next(err); // Pass to error handler
+      next(err); 
     }
   }
 

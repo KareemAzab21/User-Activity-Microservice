@@ -9,8 +9,6 @@ class ActivityRepository {
         
         userId: activity.userId,
         action: activity.action,
-        entityType: activity.entityType,
-        entityId: activity.entityId,
         metadata: activity.metadata,
         timestamp: activity.timestamp
       });

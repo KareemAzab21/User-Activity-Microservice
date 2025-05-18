@@ -8,7 +8,7 @@ const connectDB = async () => {
     });
     console.log('MongoDB connected');
     
-    // Create indexes
+
     await mongoose.connection.db.collection('activities')
       .createIndex({ userId: 1, timestamp: -1 });
     

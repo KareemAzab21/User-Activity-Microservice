@@ -5,7 +5,7 @@ class ActivityConsumer {
   constructor(activityService) {
     this.kafka = new Kafka(kafkaConfig);
     this.consumer = this.kafka.consumer({ 
-      groupId: 'activity-consumer-group-TEST-'
+      groupId: 'activity-consumer-group-TEST'
     });
     this.activityService = activityService;
   }
